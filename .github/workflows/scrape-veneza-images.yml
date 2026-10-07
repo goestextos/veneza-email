@@ -1,0 +1,131 @@
+name: Scrape Veneza product images
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/scrape-veneza-images.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Scrape official product images
+        run: |
+          python - <<'PY'
+          import os, re, json, html, mimetypes
+          from urllib.parse import urljoin, urlparse
+          import requests
+
+          products = {
+            "biscoito-food-10x100": "https://www.distribuidoraveneza.com.br/biscoito-de-arroz-barbecue-veneza-food-saudavel-10x100-gramas-caixa",
+            "chimichurri-sem-pimenta": "https://www.distribuidoraveneza.com.br/chimichurri-spimenta-2-kg-pacote",
+            "chimichurri-com-pimenta": "https://www.distribuidoraveneza.com.br/chimichurri-cpimenta-2-kg-pacote",
+            "pega-marido": "https://www.distribuidoraveneza.com.br/tempero-pega-marido-2kg-pacote",
+            "biscoito-barbecue": "https://www.distribuidoraveneza.com.br/biscoito-de-arroz-c-barbecue-25-kg-pacote",
+            "cacau-nibs": "https://www.distribuidoraveneza.com.br/cacau-nibs-2-kg-pacote",
+            "pimenta-reino": "https://www.distribuidoraveneza.com.br/pimenta-do-reino-preta-em-graos-3-kg-pacote",
+            "creme-cebola": "https://www.distribuidoraveneza.com.br/creme-de-cebola-3-kg-pacote",
+            "tempera-tudo": "https://www.distribuidoraveneza.com.br/tempero-tempera-tudo-3-kg-pacote",
+            "pepita-girassol": "https://www.distribuidoraveneza.com.br/pepita-de-girassol-5-kg-pacote",
+            "fava-branca-importada": "https://www.distribuidoraveneza.com.br/feijao-fava-branca-importada-5kg-pacote",
+            "fava-branca-nacional": "https://www.distribuidoraveneza.com.br/feijao-fava-branca-nacional-5kg-pacote",
+            "fava-rajada-preta": "https://www.distribuidoraveneza.com.br/feijao-fava-rajada-preta-5kg-pacote",
+            "fava-rajada-vermelha": "https://www.distribuidoraveneza.com.br/feijao-fava-rajada-vermelha-5kg-pacote",
+            "pimenta-rosa": "https://www.distribuidoraveneza.com.br/temp-pimenta-rosa-em-graos-5-kg-saco",
+            "salsa-desidratada": "https://www.distribuidoraveneza.com.br/salsa-desidratada-10-kg-saca",
+            "chimichurri-specialle": "https://www.distribuidoraveneza.com.br/chimichurri-spimenta-specialle-saca-10kg",
+          }
+
+          outdir = "assets/email-2026-10-07"
+          os.makedirs(outdir, exist_ok=True)
+          sess = requests.Session()
+          sess.headers.update({
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/154 Safari/537.36"
+          })
+
+          def get_image(page_url):
+              r = sess.get(page_url, timeout=30)
+              r.raise_for_status()
+              t = r.text
+
+              patterns = [
+                  r'<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)["\']',
+                  r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:image["\']',
+                  r'<meta[^>]+name=["\']twitter:image(?::src)?["\'][^>]+content=["\']([^"\']+)["\']',
+                  r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+name=["\']twitter:image(?::src)?["\']',
+              ]
+              for pat in patterns:
+                  m = re.search(pat, t, flags=re.I)
+                  if m:
+                      u = html.unescape(m.group(1))
+                      return urljoin(page_url, u)
+
+              # JSON-LD fallback
+              for m in re.finditer(r'<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>', t, flags=re.I|re.S):
+                  block = html.unescape(m.group(1))
+                  try:
+                      data = json.loads(block)
+                  except Exception:
+                      continue
+                  stack = data if isinstance(data, list) else [data]
+                  for obj in stack:
+                      if isinstance(obj, dict) and "image" in obj:
+                          im = obj["image"]
+                          if isinstance(im, list) and im: im = im[0]
+                          if isinstance(im, dict): im = im.get("url") or im.get("contentUrl")
+                          if isinstance(im, str):
+                              return urljoin(page_url, im)
+
+              # Prefer actual product CDN images over UI icons.
+              candidates = re.findall(r'(https?://imageswscdn\.wslojas\.com\.br/files/24534/[^"\'<> ]+)', t, flags=re.I)
+              candidates = [html.unescape(x).replace("\\u0026","&") for x in candidates]
+              bad = ("logo", "favorit", "frete", "user", "carrinho", "forma", "selo", "banner", "icone", "icon")
+              candidates = [x for x in candidates if not any(b in x.lower() for b in bad)]
+              if candidates:
+                  # Prefer MED_/produto and the longest filename (normally product-specific).
+                  candidates.sort(key=lambda x: (("produto-" in x.lower()) or ("/med_" in x.lower()), len(x)), reverse=True)
+                  return candidates[0]
+              raise RuntimeError("No product image found")
+
+          mapping = {}
+          for key, page in products.items():
+              try:
+                  image_url = get_image(page)
+                  ir = sess.get(image_url, timeout=30)
+                  ir.raise_for_status()
+                  ctype = ir.headers.get("content-type","").split(";")[0].lower()
+                  ext = mimetypes.guess_extension(ctype) or os.path.splitext(urlparse(image_url).path)[1] or ".jpg"
+                  if ext == ".jpe": ext = ".jpg"
+                  filename = key + ext
+                  path = os.path.join(outdir, filename)
+                  with open(path, "wb") as f:
+                      f.write(ir.content)
+                  mapping[key] = {"page": page, "source_image": image_url, "asset": path}
+                  print(key, "->", image_url)
+              except Exception as e:
+                  mapping[key] = {"page": page, "error": str(e)}
+                  print("ERROR", key, e)
+
+          with open(os.path.join(outdir, "images.json"), "w", encoding="utf-8") as f:
+              json.dump(mapping, f, ensure_ascii=False, indent=2)
+          PY
+      - name: Commit images
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/email-2026-10-07
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "Add official Veneza product images"
+            git push
+          fi
