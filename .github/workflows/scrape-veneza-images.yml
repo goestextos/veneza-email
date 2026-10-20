@@ -47,10 +47,12 @@ jobs:
           sess = requests.Session()
           sess.headers.update({"User-Agent":"Mozilla/5.0"})
 
-          def get_image(page_url):
+          def fetch_page(page_url):
               r = sess.get(page_url, timeout=30)
               r.raise_for_status()
-              t = r.text
+              return r.text
+
+          def get_image_from_html(page_url, t):
               patterns = [
                   r'<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)["\']',
                   r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:image["\']',
@@ -68,10 +70,62 @@ jobs:
                   return candidates[0]
               raise RuntimeError("No product image found")
 
+          def get_price_from_html(t):
+              # Prefer structured product offers.
+              for m in re.finditer(r'<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>', t, flags=re.I|re.S):
+                  block = html.unescape(m.group(1))
+                  try:
+                      data = json.loads(block)
+                  except Exception:
+                      continue
+                  stack = data if isinstance(data, list) else [data]
+                  while stack:
+                      obj = stack.pop(0)
+                      if isinstance(obj, list):
+                          stack.extend(obj)
+                          continue
+                      if not isinstance(obj, dict):
+                          continue
+                      typ = obj.get("@type")
+                      if typ == "Product" or (isinstance(typ, list) and "Product" in typ):
+                          offers = obj.get("offers")
+                          if isinstance(offers, list) and offers:
+                              offers = offers[0]
+                          if isinstance(offers, dict):
+                              val = offers.get("price") or offers.get("lowPrice")
+                              if val is not None:
+                                  try:
+                                      return float(str(val).replace(",", "."))
+                                  except Exception:
+                                      pass
+                      for v in obj.values():
+                          if isinstance(v, (dict, list)):
+                              stack.append(v)
+
+              patterns = [
+                  r'<meta[^>]+property=["\']product:price:amount["\'][^>]+content=["\']([^"\']+)["\']',
+                  r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']product:price:amount["\']',
+              ]
+              for pat in patterns:
+                  m = re.search(pat, t, flags=re.I)
+                  if m:
+                      try:
+                          return float(m.group(1).replace(",", "."))
+                      except Exception:
+                          pass
+              return None
+
+          def brl(v):
+              if v is None: return None
+              s=f"{v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+              return "R$ " + s
+
           mapping={}
           for key,page in products.items():
               try:
-                  image_url=get_image(page)
+                  t=fetch_page(page)
+                  image_url=get_image_from_html(page, t)
+                  price=get_price_from_html(t)
                   ir=sess.get(image_url,timeout=30)
                   ir.raise_for_status()
                   ctype=ir.headers.get("content-type","").split(";")[0].lower()
@@ -80,8 +134,8 @@ jobs:
                   filename=key+ext
                   path=os.path.join(outdir,filename)
                   with open(path,"wb") as fh: fh.write(ir.content)
-                  mapping[key]={"page":page,"source_image":image_url,"asset":path}
-                  print(key,"->",image_url)
+                  mapping[key]={"page":page,"source_image":image_url,"asset":path,"price":brl(price)}
+                  print(key,"->",image_url,"price=",brl(price))
               except Exception as e:
                   mapping[key]={"page":page,"error":str(e)}
                   print("ERROR",key,e)
