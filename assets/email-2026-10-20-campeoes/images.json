@@ -2,61 +2,73 @@
   "aveia-flocos-fino-25kg": {
     "page": "https://distribuidoraveneza.com.br/aveia-flocos-fino-25kg-saca",
     "source_image": "https://imageswscdn.wslojas.com.br/files/24534/produto-aveia-flocos-fino-25kg-saca-3966.jpg",
-    "asset": "assets/email-2026-10-20-campeoes/aveia-flocos-fino-25kg.jpg"
+    "asset": "assets/email-2026-10-20-campeoes/aveia-flocos-fino-25kg.jpg",
+    "price": "R$ 131,00"
   },
   "chia-3kg": {
     "page": "https://distribuidoraveneza.com.br/chia-3kg-pacote",
     "source_image": "https://imageswscdn.wslojas.com.br/files/24534/chia-5kg-pacote-30-1.jpg",
-    "asset": "assets/email-2026-10-20-campeoes/chia-3kg.jpg"
+    "asset": "assets/email-2026-10-20-campeoes/chia-3kg.jpg",
+    "price": "R$ 35,00"
   },
   "farelo-aveia-25kg": {
     "page": "https://distribuidoraveneza.com.br/farelo-de-aveia-25kg-saca",
     "source_image": "https://imageswscdn.wslojas.com.br/files/24534/produto-farelo-de-aveia-25kg-saca-8280.jpg",
-    "asset": "assets/email-2026-10-20-campeoes/farelo-aveia-25kg.jpg"
+    "asset": "assets/email-2026-10-20-campeoes/farelo-aveia-25kg.jpg",
+    "price": "R$ 154,00"
   },
   "semente-abobora-crua-2kg": {
     "page": "https://distribuidoraveneza.com.br/semente-de-abobora-scasca-crua-2-kg-pacote",
     "source_image": "https://imageswscdn.wslojas.com.br/files/24534/semente-de-abobora-scasca-crua-2-kg-pacote-36-1.jpg",
-    "asset": "assets/email-2026-10-20-campeoes/semente-abobora-crua-2kg.jpg"
+    "asset": "assets/email-2026-10-20-campeoes/semente-abobora-crua-2kg.jpg",
+    "price": "R$ 126,00"
   },
   "uva-passa-preta-10kg": {
     "page": "https://distribuidoraveneza.com.br/uva-passas-preta-argentina-10-kg-caixa",
     "source_image": "https://imageswscdn.wslojas.com.br/files/24534/uva-passas-preta-10-kg-caixa-59-1.jpg",
-    "asset": "assets/email-2026-10-20-campeoes/uva-passa-preta-10kg.jpg"
+    "asset": "assets/email-2026-10-20-campeoes/uva-passa-preta-10kg.jpg",
+    "price": "R$ 138,00"
   },
   "cravo-flor-1kg": {
     "page": "https://distribuidoraveneza.com.br/cravo-flor-1-kg-pacote",
     "source_image": "https://imageswscdn.wslojas.com.br/files/24534/cha-cravo-flor-1-kg-pacote-19-1.jpg",
-    "asset": "assets/email-2026-10-20-campeoes/cravo-flor-1kg.jpg"
+    "asset": "assets/email-2026-10-20-campeoes/cravo-flor-1kg.jpg",
+    "price": "R$ 67,00"
   },
   "vinagre-maca-organico-12x400": {
     "page": "https://distribuidoraveneza.com.br/vinagre-de-maca-organico-12x400ml-caixa",
     "source_image": "https://imageswscdn.wslojas.com.br/files/24534/vinagre-de-maca-organico-12x400ml-caixa-522225.jpg",
-    "asset": "assets/email-2026-10-20-campeoes/vinagre-maca-organico-12x400.jpg"
+    "asset": "assets/email-2026-10-20-campeoes/vinagre-maca-organico-12x400.jpg",
+    "price": "R$ 168,00"
   },
   "linhaca-dourada-5kg": {
     "page": "https://distribuidoraveneza.com.br/linhaca-dourada-5-kg-pacote",
     "source_image": "https://imageswscdn.wslojas.com.br/files/24534/linhaca-dourada-5-kg-pacote-12-1.jpg",
-    "asset": "assets/email-2026-10-20-campeoes/linhaca-dourada-5kg.jpg"
+    "asset": "assets/email-2026-10-20-campeoes/linhaca-dourada-5kg.jpg",
+    "price": "R$ 70,00"
   },
   "maca-peruana-2kg": {
     "page": "https://distribuidoraveneza.com.br/maca-peruana-2-kg-pacote",
     "source_image": "https://imageswscdn.wslojas.com.br/files/24534/maca-peruana-3-kg-pacote-89-1.jpg",
-    "asset": "assets/email-2026-10-20-campeoes/maca-peruana-2kg.jpg"
+    "asset": "assets/email-2026-10-20-campeoes/maca-peruana-2kg.jpg",
+    "price": "R$ 35,00"
   },
   "feno-grego-2kg": {
     "page": "https://distribuidoraveneza.com.br/feno-grego-po-2-kg-pacote",
     "source_image": "https://imageswscdn.wslojas.com.br/files/24534/produto-feno-grego-po-2-kg-pacote-5741.jpg",
-    "asset": "assets/email-2026-10-20-campeoes/feno-grego-2kg.jpg"
+    "asset": "assets/email-2026-10-20-campeoes/feno-grego-2kg.jpg",
+    "price": "R$ 21,00"
   },
   "farinha-amendoa-2kg": {
     "page": "https://distribuidoraveneza.com.br/farinha-de-amendoa-2-kg-pacote",
     "source_image": "https://imageswscdn.wslojas.com.br/files/24534/farinha-de-amendoa-2-kg-pacote-30-1.jpg",
-    "asset": "assets/email-2026-10-20-campeoes/farinha-amendoa-2kg.jpg"
+    "asset": "assets/email-2026-10-20-campeoes/farinha-amendoa-2kg.jpg",
+    "price": "R$ 143,00"
   },
   "castanha-para-media-4kg": {
     "page": "https://distribuidoraveneza.com.br/castanha-do-para-media-pacote-4-kg",
     "source_image": "https://imageswscdn.wslojas.com.br/files/24534/castanha-do-para-media-pacote-4-kg-98-1.jpg",
-    "asset": "assets/email-2026-10-20-campeoes/castanha-para-media-4kg.jpg"
+    "asset": "assets/email-2026-10-20-campeoes/castanha-para-media-4kg.jpg",
+    "price": "R$ 319,00"
   }
 }
